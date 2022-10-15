@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -8,7 +11,17 @@ class Scanner extends StatefulWidget {
 
 class _ScannerState extends State<Scanner> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  late QRViewController controller;
+  QRViewController? controller;
+  final db = FirebaseFirestore.instance;
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    }
+    controller!.resumeCamera();
+  }
 
   @override
   void dispose() {
@@ -64,10 +77,19 @@ class _ScannerState extends State<Scanner> {
   }
 
   void _onQRViewCreated(QRViewController controller) {
-    this.controller = controller;
-    controller.scannedDataStream.listen((scanData) async {
-      controller.pauseCamera();
+    setState(() {
+      this.controller = controller;
+    });
+    controller.scannedDataStream.listen((scanData) {
       print("FOUND QR CODE: ${scanData.code!}");
+      final newCase = <String, dynamic>{
+        "id": scanData.code,
+        "createdDate": DateTime.now()
+      };
+      print("FOUND QR CODE: ${scanData.code!}");
+      db.collection("case-qr").add(newCase).then((DocumentReference doc) =>
+          print('DocumentSnapshot added with ID: ${doc.id}')
+      );
       Navigator.pop(context, true);
     });
   }
