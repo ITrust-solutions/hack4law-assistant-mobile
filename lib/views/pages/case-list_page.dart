@@ -2,6 +2,8 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:io_karolbryzgiel_flutter/views/pages/case-details_page.dart';
 
+import 'qr-code-scanner_page.dart';
+
 class CaseList extends StatefulWidget {
   const CaseList({super.key});
 
@@ -47,7 +49,16 @@ class _CaseListState extends State<CaseList> {
           ),
           ),
           ElevatedButton.icon(
-            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+            ),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => Scanner(),
+              ));
+            },
             icon: const Icon(
               Icons.qr_code_2_outlined,
               size: 24.0,
