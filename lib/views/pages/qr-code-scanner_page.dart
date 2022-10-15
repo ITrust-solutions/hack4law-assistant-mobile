@@ -70,35 +70,5 @@ class _ScannerState extends State<Scanner> {
       print("FOUND QR CODE: ${scanData.code!}");
       Navigator.pop(context, true);
     });
-    //   if (await canLaunch(scanData.code)) {
-    //     await launch(scanData.code);
-    //     controller.resumeCamera();
-      // } else {
-      //   showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return AlertDialog(
-      //         title: Text('Could not find viable url'),
-      //         content: SingleChildScrollView(
-      //           child: ListBody(
-      //             children: <Widget>[
-      //               Text('Barcode Type: ${describeEnum(scanData.format)}'),
-      //               Text('Data: ${scanData.code}'),
-      //             ],
-      //           ),
-      //         ),
-      //         actions: <Widget>[
-      //           TextButton(
-      //             child: Text('Ok'),
-      //             onPressed: () {
-      //               Navigator.of(context).pop();
-      //             },
-      //           ),
-      //         ],
-      //       );
-      //     },
-      //   ).then((value) => controller.resumeCamera());
-      // }
-    // });
   }
 }

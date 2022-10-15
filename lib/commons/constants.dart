@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 const kLabelTextStyle = TextStyle(fontSize: 18.0, color: Color(0xFF8D8E98));
 const kWhiteLabelTextStyle = TextStyle(fontSize: 14.0, color: Colors.white);
+
 const kMediumLabelTextStyle =
 TextStyle(fontSize: 24.0, fontWeight: FontWeight.w600);
 
