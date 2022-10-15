@@ -1,5 +1,6 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:io_karolbryzgiel_flutter/model/case.dart';
+import 'package:io_karolbryzgiel_flutter/services/case-service.dart';
 import 'package:io_karolbryzgiel_flutter/views/pages/case-details_page.dart';
 
 import 'qr-code-scanner_page.dart';
@@ -12,8 +13,14 @@ class CaseList extends StatefulWidget {
 }
 
 class _CaseListState extends State<CaseList> {
-  final _suggestions = <WordPair>[];
+  late Future<List<Case>> caseList;
+  final caseService = CaseService();
   final _biggerFont = const TextStyle(fontSize: 18);
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,57 +30,64 @@ class _CaseListState extends State<CaseList> {
       ),
       body: Column(
         children: [
-          Expanded(child: ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemBuilder: /*1*/ (context, i) {
-              if (i.isOdd) return const Divider();
-
-              final index = i ~/ 2; /*3*/
-              if (index >= _suggestions.length) {
-                _suggestions.addAll(generateWordPairs().take(10));
-              }
-              return ListTile(
-                title: Text(
-                  _suggestions[index].asPascalCase,
-                  style: _biggerFont,
-                ),
-                subtitle: const Text(
-                    "Data wpływu: 16.02.02"
-                ),
-                onTap: () {
-                  this._openCase();
-                },
-                trailing: const Icon(Icons.arrow_forward),
-              );
-            },
+          Expanded(child: FutureBuilder<List<Case>>(
+              future: caseService.fetchAllCases(),
+              builder: (context, future) {
+                if (!future.hasData) {
+                  return Container(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: const Text('Brak przypisanych spraw.'),);
+                } else {
+                  List<Case> list = future.data!;
+                  return ListView.builder(
+                      itemCount: list.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            list[index].caseNumber,
+                            style: _biggerFont,
+                          ),
+                          subtitle: Text(
+                              list[index].receiptDate.toString()
+                          ),
+                          onTap: () {
+                            this._openCase(list[index]);
+                          },
+                          trailing: const Icon(Icons.arrow_forward),
+                        );
+                        // return Container(child: Text(list[index].caseNumber));
+                      });
+                }
+              }),
           ),
-          ),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
+          Center(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30.0),
                 ),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Scanner(),
+                ));
+              },
+              icon: const Icon(
+                Icons.qr_code_2_outlined,
+                size: 24.0,
+              ),
+              label: const Text('Otwórz sprawę w aplikacji'),
             ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => Scanner(),
-              ));
-            },
-            icon: const Icon(
-              Icons.qr_code_2_outlined,
-              size: 24.0,
-            ),
-            label: const Text('Otwórz sprawę w aplikacji'),
           ),
         ],
       ),
     );
   }
 
-  void _openCase() {
+  void _openCase(Case case_s) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => CaseDetails(
-          caseId: "test",
+          case_s: case_s,
         ))
     );
   }

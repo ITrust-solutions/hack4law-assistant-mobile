@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:io_karolbryzgiel_flutter/model/case.dart';
 import 'package:io_karolbryzgiel_flutter/views/pages/notes-list.dart';
 import 'package:io_karolbryzgiel_flutter/views/widgets/reusable_card.dart';
 
@@ -8,25 +10,25 @@ import '../widgets/icon_popup_menu_item.dart';
 enum Menu { itemOne, itemTwo, itemThree, itemFour }
 
 class CaseDetails extends StatefulWidget {
-  final String caseId;
+  final Case case_s;
 
-  const CaseDetails({Key? key, required this.caseId}) : super(key: key);
+  const CaseDetails({Key? key, required this.case_s}) : super(key: key);
 
   @override
-  State<CaseDetails> createState() => _CaseDetailsState(caseId: caseId);
+  State<CaseDetails> createState() => _CaseDetailsState(case_s: case_s);
 }
 
 class _CaseDetailsState extends State<CaseDetails> {
   String _selectedMenu = '';
-  String caseId;
+  Case case_s;
 
-  _CaseDetailsState({required this.caseId});
+  _CaseDetailsState({required this.case_s});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Szczegóły sprawy $caseId"),
+        title: Text("Szczegóły sprawy"),
         actions: <Widget>[
           // This button presents popup menu items.
           PopupMenuButton<Menu>(
@@ -66,33 +68,33 @@ class _CaseDetailsState extends State<CaseDetails> {
             padding: EdgeInsets.all(15.0),
             alignment: Alignment.center,
             child: Text(
-              "Sprawa: XIV/15/2022",
+              "Numer sprawy: ${case_s.caseNumber}",
               style: kMediumLabelTextStyle,
             ),
           ),
           Container(
               padding: EdgeInsets.all(15.0),
               alignment: Alignment.center,
-              child: const Chip(
+              child: Chip(
                 backgroundColor: kBottomContainerColor,
-                label: Text('W TOKU'),
+                label: Text(case_s.caseStatus!),
                 labelStyle: kWhiteLabelTextStyle,
               )
           ),
           Container(
             padding: EdgeInsets.all(15.0),
             child: Text(
-              "Data wpływu: 26 paź, 2022 15:40" ,
+              "Data wpływu: ${DateFormat('yyyy-MM-dd kk:mm').format(case_s.receiptDate!)}" ,
             ),
           ),
           Container(
             padding: EdgeInsets.all(15.0),
             child: Text(
-              "Deadline: 26 paź, 2022 15:40" ,
+              "Termin wykonania: ${DateFormat('yyyy-MM-dd kk:mm').format(case_s.receiptDate!)}" ,
             ),
           ),
           ReusableCard(function: () {
-            _openNoteList();
+            _openNoteList(case_s);
           },
               leadingIcon: Icon(Icons.note_outlined),
               trailingIcon: Icon(Icons.arrow_forward),
@@ -106,9 +108,10 @@ class _CaseDetailsState extends State<CaseDetails> {
     );
   }
 
-  void _openNoteList() {
+  void _openNoteList(Case case_s) {
     Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => NoteList(
+          noteList: case_s.notesList,
         ))
     );
   }
